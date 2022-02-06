@@ -719,7 +719,11 @@ clientGrabMouseButton (Client * c)
     if (screen_info->params->raise_with_any_button)
     {
         grabButton (screen_info->display_info->devices, clientGetXDisplay (c),
-                    AnyButton, AnyModifier, c->window);
+                    Button1, AnyModifier, c->window);
+        grabButton (screen_info->display_info->devices, clientGetXDisplay (c),
+                    Button2, AnyModifier, c->window);
+        grabButton (screen_info->display_info->devices, clientGetXDisplay (c),
+                    Button3, AnyModifier, c->window);
     }
     else
     {
