@@ -94,17 +94,16 @@ clientCycleCreateList (Client *c)
 {
     ScreenInfo *screen_info;
     Client *c2;
-    guint range, search_range,   i;
-    GList *client_list;
+    guint range, search_range, i;
+    GList *client_list = NULL;
 
     g_return_val_if_fail (c, NULL);
     TRACE ("client \"%s\" (0x%lx)", c->name, c->window);
 
     screen_info = c->screen_info;
     range = clientGetCycleRange (screen_info);
-    client_list = NULL;
 
-    for (c2 = c, i = 0; c && i < screen_info->client_count; i++, c2 = c2->next)
+    for (c2 = c, i = 0; i < screen_info->client_count; i++, c2 = c2->next)
     {
         search_range = range;
         /*
@@ -257,7 +256,7 @@ clientCycleEventFilter (XfwmEvent *event, gpointer data)
     TRACE ("entering");
 
     passdata = (ClientCycleData *) data;
-    c = tabwinGetSelected(passdata->tabwin);
+    c = tabwinGetSelected (passdata->tabwin);
     if (c == NULL)
     {
         return EVENT_FILTER_CONTINUE;
@@ -296,29 +295,29 @@ clientCycleEventFilter (XfwmEvent *event, gpointer data)
                 }
                 else if (event->key.keycode == up)
                 {
-                    c2 = tabwinSelectDelta(passdata->tabwin, -1, 0);
+                    c2 = tabwinSelectDelta (passdata->tabwin, -1, 0);
                 }
                 else if (event->key.keycode == down)
                 {
-                    c2 = tabwinSelectDelta(passdata->tabwin, 1, 0);
+                    c2 = tabwinSelectDelta (passdata->tabwin, 1, 0);
                 }
                 else if (event->key.keycode == left)
                 {
-                    c2 = tabwinSelectDelta(passdata->tabwin, 0, -1);
+                    c2 = tabwinSelectDelta (passdata->tabwin, 0, -1);
                 }
                 else if (event->key.keycode == right)
                 {
-                    c2 = tabwinSelectDelta(passdata->tabwin, -0, 1);
+                    c2 = tabwinSelectDelta (passdata->tabwin, 0, 1);
                 }
                 else if (key == KEY_CYCLE_REVERSE_WINDOWS)
                 {
                     TRACE ("cycle: previous");
-                    c2 = tabwinSelectPrev(passdata->tabwin);
+                    c2 = tabwinSelectPrev (passdata->tabwin);
                 }
                 else if (key == KEY_CYCLE_WINDOWS)
                 {
                     TRACE ("cycle: next");
-                    c2 = tabwinSelectNext(passdata->tabwin);
+                    c2 = tabwinSelectNext (passdata->tabwin);
                 }
                 if (c2)
                 {
@@ -330,13 +329,12 @@ clientCycleEventFilter (XfwmEvent *event, gpointer data)
                 {
                     cycling = FALSE;
                 }
-                status = EVENT_FILTER_STOP;
             }
             else
             {
                 int keysym = XkbKeycodeToKeysym (event->meta.xevent->xany.display, event->key.keycode, 0, 0);
 
-                if (IsModifierKey(keysym))
+                if (IsModifierKey (keysym))
                 {
                     if (!(myScreenGetModifierPressed (screen_info) & modifiers))
                     {
@@ -357,22 +355,22 @@ clientCycleEventFilter (XfwmEvent *event, gpointer data)
                 {
                     if (GDK_WINDOW_XID (gtk_widget_get_window (li->data)) == event->meta.window)
                     {
-                        if  (event->button.button == Button1)
+                        if (event->button.button == Button1)
                         {
-                            c2 = tabwinSelectHovered (passdata->tabwin);
+                            tabwinSelectHovered (passdata->tabwin);
                             break;
                         }
                         else if (event->button.button == Button4)
                         {
                             /* Mouse wheel scroll up */
                             TRACE ("cycle: previous");
-                            c2 = tabwinSelectPrev(passdata->tabwin);
+                            c2 = tabwinSelectPrev (passdata->tabwin);
                         }
                         else if (event->button.button == Button5)
                         {
                             /* Mouse wheel scroll down */
                             TRACE ("cycle: next");
-                            c2 = tabwinSelectNext(passdata->tabwin);
+                            c2 = tabwinSelectNext (passdata->tabwin);
                         }
 
                         status = EVENT_FILTER_STOP;
@@ -427,7 +425,7 @@ clientCycleEventFilter (XfwmEvent *event, gpointer data)
                             break; /* No need to go any further */
                         }
                     }
-                    c = tabwinRemoveClient(passdata->tabwin, removed);
+                    c = tabwinRemoveClient (passdata->tabwin, removed);
                     cycling = clientCycleUpdateWireframe (c, passdata);
                     break;
             }
@@ -480,7 +478,6 @@ clientCycle (Client * c, XfwmEventKey *event)
         return;
     }
 
-    modifier = 0;
     key = myScreenGetKeyPressed (screen_info, event);
     if (key == KEY_CYCLE_REVERSE_WINDOWS)
     {
@@ -492,9 +489,10 @@ clientCycle (Client * c, XfwmEventKey *event)
         selected = g_list_next (client_list);
         modifier = screen_info->params->keys[KEY_CYCLE_WINDOWS].modifier;
     }
+
+    /* Only one element in list */
     if (!selected)
     {
-        /* Only one element in list */
         selected = client_list;
     }
 
@@ -516,7 +514,6 @@ clientCycle (Client * c, XfwmEventKey *event)
         myDisplayBeep (display_info);
         myScreenUngrabKeyboard (screen_info, myDisplayGetCurrentTime (display_info));
         g_list_free (client_list);
-
         return;
     }
 
@@ -551,8 +548,10 @@ clientCycle (Client * c, XfwmEventKey *event)
 
     if (passdata.inside)
     {
-        /* A bit of a hack, flush EnterNotify if the pointer is inside
-         * the tabwin to defeat focus-follow-mouse tracking */
+        /*
+         * A bit of a hack, flush EnterNotify if the pointer is inside
+         * the tabwin to defeat focus-follow-mouse tracking
+         */
         eventFilterPush (display_info->xfilter, clientCycleFlushEventFilter, display_info);
         gtk_main ();
         eventFilterPop (display_info->xfilter);

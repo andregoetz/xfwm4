@@ -36,6 +36,17 @@ typedef struct _MyKey MyKey;
 struct _MyKey
 {
     KeyCode keycode;
+    /*
+     * Modifier, key pressed along with myKey
+     * e.g. ctrl + a where ctrl is the modifier of myKey a:
+     * no modifier    = 0
+     * shift          = 1
+     * ctrl           = 4
+     * alt            = 8
+     * super          = 64
+     * with combinations the value gets added:
+     * ctrl + shift   = 4 + 1 = 5
+     */
     guint modifier;
     gchar *internal_name;
 };

@@ -618,10 +618,10 @@ loadKeyBindings (ScreenInfo *screen_info)
 
     for (i = 0; i < 12; i++)
     {
-        g_snprintf(keyname, sizeof (keyname), "move_window_workspace_%d_key", i + 1);
+        g_snprintf (keyname, sizeof (keyname), "move_window_workspace_%d_key", i + 1);
         parseShortcut (screen_info, KEY_MOVE_WORKSPACE_1 + i, keyname, shortcuts);
 
-        g_snprintf(keyname, sizeof (keyname), "workspace_%d_key", i + 1);
+        g_snprintf (keyname, sizeof (keyname), "workspace_%d_key", i + 1);
         parseShortcut (screen_info, KEY_WORKSPACE_1 + i, keyname, shortcuts);
     }
 
@@ -629,8 +629,6 @@ loadKeyBindings (ScreenInfo *screen_info)
 
     myScreenUngrabKeys (screen_info);
     myScreenGrabKeys (screen_info);
-
-    return;
 }
 
 gboolean
