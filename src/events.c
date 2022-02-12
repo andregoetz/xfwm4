@@ -325,6 +325,7 @@ handleKeyPress (DisplayInfo *display_info, XfwmEventKey *event)
                 clientResize (c, CORNER_BOTTOM_RIGHT, NULL);
                 break;
             case KEY_CYCLE_WINDOWS:
+            case KEY_CYCLE_KEEP_WINDOWS:
             case KEY_CYCLE_REVERSE_WINDOWS:
                 clientCycle (c, event);
                 break;

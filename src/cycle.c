@@ -56,6 +56,7 @@ struct _ClientCycleData
     Tabwin *tabwin;
     WireFrame *wireframe;
     gboolean inside;
+    gboolean keepOpen;
 };
 
 static gint
@@ -290,7 +291,13 @@ clientCycleEventFilter (XfwmEvent *event, gpointer data)
                  */
                 if (event->key.keycode == cancel)
                 {
-                    c2 = tabwinSelectHead (passdata->tabwin);
+                    if (passdata->keepOpen) {
+                        c2 = tabwinGetSelected (passdata->tabwin);
+                    }
+                    else
+                    {
+                        c2 = tabwinSelectHead (passdata->tabwin);
+                    }
                     cycling = FALSE;
                 }
                 else if (event->key.keycode == up)
@@ -314,7 +321,7 @@ clientCycleEventFilter (XfwmEvent *event, gpointer data)
                     TRACE ("cycle: previous");
                     c2 = tabwinSelectPrev (passdata->tabwin);
                 }
-                else if (key == KEY_CYCLE_WINDOWS)
+                else if (key == KEY_CYCLE_WINDOWS || key == KEY_CYCLE_KEEP_WINDOWS)
                 {
                     TRACE ("cycle: next");
                     c2 = tabwinSelectNext (passdata->tabwin);
@@ -324,10 +331,15 @@ clientCycleEventFilter (XfwmEvent *event, gpointer data)
                     clientCycleUpdateWireframe (c2, passdata);
                 }
 
-                /* If last key press event had not our modifiers pressed, finish cycling */
+                /*
+                 * If last key press event had not our modifiers pressed, finish cycling
+                 * except when KEY_CYCLE_KEEP_WINDOWS was pressed
+                 */
                 if (!(event->key.state & modifiers))
                 {
-                    cycling = FALSE;
+                    if (!passdata->keepOpen) {
+                        cycling = FALSE;
+                    }
                 }
             }
             else
@@ -338,7 +350,9 @@ clientCycleEventFilter (XfwmEvent *event, gpointer data)
                 {
                     if (!(myScreenGetModifierPressed (screen_info) & modifiers))
                     {
-                        cycling = FALSE;
+                        if (!passdata->keepOpen) {
+                            cycling = FALSE;
+                        }
                     }
                 }
             }
@@ -483,6 +497,12 @@ clientCycle (Client * c, XfwmEventKey *event)
     {
         selected = g_list_last (client_list);
         modifier = screen_info->params->keys[KEY_CYCLE_REVERSE_WINDOWS].modifier;
+    }
+    else if (key == KEY_CYCLE_KEEP_WINDOWS)
+    {
+        selected = g_list_next (client_list);
+        modifier = screen_info->params->keys[KEY_CYCLE_KEEP_WINDOWS].modifier;
+        passdata.keepOpen = TRUE;
     }
     else
     {

@@ -572,6 +572,7 @@ loadKeyBindings (ScreenInfo *screen_info)
     parseShortcut (screen_info, KEY_ADD_ADJACENT_WORKSPACE, "add_adjacent_workspace_key", shortcuts);
     parseShortcut (screen_info, KEY_CLOSE_WINDOW, "close_window_key", shortcuts);
     parseShortcut (screen_info, KEY_CYCLE_WINDOWS, "cycle_windows_key", shortcuts);
+    parseShortcut (screen_info, KEY_CYCLE_KEEP_WINDOWS, "cycle_keep_windows_key", shortcuts);
     parseShortcut (screen_info, KEY_CYCLE_REVERSE_WINDOWS, "cycle_reverse_windows_key", shortcuts);
     parseShortcut (screen_info, KEY_DEL_WORKSPACE, "del_workspace_key", shortcuts);
     parseShortcut (screen_info, KEY_DEL_ACTIVE_WORKSPACE, "del_active_workspace_key", shortcuts);
