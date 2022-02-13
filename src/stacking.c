@@ -554,33 +554,6 @@ clientLower (Client * c, Window wsibling)
     }
 }
 
-gboolean
-clientAdjustFullscreenLayer (Client *c, gboolean set)
-{
-    g_return_val_if_fail (c, FALSE);
-
-    TRACE ("%s fullscreen layer for  \"%s\" (0x%lx)", set ? "setting" : "unsetting", c->name, c->window);
-
-    if (set)
-    {
-        if (FLAG_TEST(c->flags, CLIENT_FLAG_FULLSCREEN))
-        {
-            clientSetLayer (c, WIN_LAYER_FULLSCREEN);
-            return TRUE;
-        }
-    }
-    else if (c->win_layer == WIN_LAYER_FULLSCREEN)
-    {
-        if (FLAG_TEST(c->flags, CLIENT_FLAG_FULLSCREEN))
-        {
-            TRACE ("Moving \"%s\" (0x%lx) to initial layer %d", c->name, c->window, c->pre_fullscreen_layer);
-            clientSetLayer (c, c->pre_fullscreen_layer);
-            return TRUE;
-        }
-    }
-    return FALSE;
-}
-
 void
 clientAddToList (Client * c)
 {
@@ -734,3 +707,51 @@ clientResetDelayedRaise (ScreenInfo *screen_info)
                                         NULL, NULL);
 }
 
+void
+clientLowerFullscreenClients (Client *c, gboolean applyStack)
+{
+    ScreenInfo *screen_info;
+    DisplayInfo *display_info;
+    Client *c2;
+    GList *sibling;
+    GList *list;
+    gboolean changed;
+
+    /* Never lower for a dock */
+    if(c->win_layer == WIN_LAYER_DOCK)
+    {
+        return;
+    }
+
+
+    screen_info = c->screen_info;
+    display_info = screen_info->display_info;
+    sibling = NULL;
+    changed = FALSE;
+
+
+    /*Lower any fullscreen windows on the same monitor*/
+    for (list = screen_info->windows_stack; list; list = g_list_next (list))
+    {
+        c2 = (Client *) list->data;
+        if ((c2 != c) && FLAG_TEST(c2->flags, CLIENT_FLAG_FULLSCREEN)
+                && c2->win_layer == WIN_LAYER_FULLSCREEN)
+        {
+            if(clientCheckSameMonitor(c, c2))
+            {
+                /* If there is one, look for its place in the list */
+                sibling = g_list_find (screen_info->windows_stack, (gconstpointer) c);
+                /* Place the lowered window just before it */
+                screen_info->windows_stack = g_list_remove (screen_info->windows_stack, (gconstpointer) c2);
+                screen_info->windows_stack = g_list_insert_before (screen_info->windows_stack, sibling, c2);
+                changed = TRUE;
+            }
+        }
+    }
+
+    if(applyStack && changed)
+    {
+        clientApplyStackList (screen_info);
+        clientSetNetClientList (c->screen_info, display_info->atoms[NET_CLIENT_LIST_STACKING], screen_info->windows_stack);
+    }
+}

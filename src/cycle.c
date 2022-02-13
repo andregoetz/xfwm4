@@ -191,7 +191,6 @@ clientCycleActivate (Client *c)
 {
     ScreenInfo *screen_info;
     DisplayInfo *display_info;
-    Client *focused;
     guint workspace;
 
     if (c == NULL)
@@ -202,13 +201,7 @@ clientCycleActivate (Client *c)
     screen_info = c->screen_info;
     display_info = screen_info->display_info;
     workspace = c->win_workspace;
-    focused = clientGetFocus ();
 
-    if ((focused) && (c != focused))
-    {
-        /* We might be able to avoid this if we are about to switch workspace */
-        clientAdjustFullscreenLayer (focused, FALSE);
-    }
     if (FLAG_TEST (c->xfwm_flags, XFWM_FLAG_WAS_SHOWN))
     {
         /* We are explicitely activating a window that was shown before show-desktop */

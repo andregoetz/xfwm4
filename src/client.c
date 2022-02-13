@@ -981,6 +981,9 @@ clientMoveResizeWindow (Client *c, XWindowChanges * wc, unsigned long mask)
     }
     /* And finally, configure the window */
     clientConfigure (c, wc, mask, flags);
+
+    /* Lower fullscreen clients that overlap with the new position */
+    clientLowerFullscreenClients(c, TRUE);
 }
 
 void
@@ -2621,7 +2624,6 @@ void
 clientActivate (Client *c, guint32 timestamp, gboolean source_is_application)
 {
     ScreenInfo *screen_info;
-    Client *focused;
     Client *ancestor;
 
     g_return_if_fail (c != NULL);
@@ -2629,15 +2631,9 @@ clientActivate (Client *c, guint32 timestamp, gboolean source_is_application)
 
     screen_info = c->screen_info;
     ancestor = clientGetTransientFor(c);
-    focused = clientGetFocus ();
 
     if ((screen_info->current_ws == c->win_workspace) || (screen_info->params->activate_action != ACTIVATE_ACTION_NONE))
     {
-        if ((focused) && (c != focused))
-        {
-            /* We might be able to avoid this if we are about to switch workspace */
-            clientAdjustFullscreenLayer (focused, FALSE);
-        }
         if (FLAG_TEST (c->xfwm_flags, XFWM_FLAG_WAS_SHOWN))
         {
             /* We are explicitely activating a window that was shown before show-desktop */
@@ -4260,6 +4256,24 @@ clientGetGtkHideTitlebar (Client * c)
         FLAG_SET (c->flags, CLIENT_FLAG_HIDE_TITLEBAR);
     }
     return old_value != FLAG_TEST (c->flags, CLIENT_FLAG_HIDE_TITLEBAR);
+}
+
+gboolean
+clientCheckSameMonitor (Client * c1, Client *c2)
+{
+    GdkRectangle rect1, rect2;
+    myScreenFindMonitorAtPoint (c1->screen_info,
+            frameX (c1) + (frameWidth (c1) / 2),
+            frameY (c1) + (frameHeight (c1) / 2), &rect1);
+
+    myScreenFindMonitorAtPoint (c2->screen_info,
+            frameX (c2) + (frameWidth (c2) / 2),
+            frameY (c2) + (frameHeight (c2) / 2), &rect2);
+
+
+    return ((rect1.x == rect2.x) && (rect1.y == rect2.y) 
+            && (rect1.height == rect2.height) && (rect1.width == rect2.width));
+
 }
 
 #ifdef HAVE_LIBSTARTUP_NOTIFICATION

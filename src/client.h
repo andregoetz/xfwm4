@@ -503,6 +503,9 @@ int                      clientGetButtonState                   (Client *,
 Client                  *clientGetLeader                        (Client *);
 gboolean                 clientGetGtkFrameExtents               (Client *);
 gboolean                 clientGetGtkHideTitlebar               (Client *);
+gboolean                 clientCheckSameMonitor                 (Client *,
+                                                                 Client *);
+
 #ifdef HAVE_LIBSTARTUP_NOTIFICATION
 char                    *clientGetStartupId                     (Client *);
 #endif /* HAVE_LIBSTARTUP_NOTIFICATION */

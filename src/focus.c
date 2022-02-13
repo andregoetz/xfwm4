@@ -208,10 +208,6 @@ clientFocusNew(Client * c)
     }
     if (give_focus)
     {
-        if (client_focus)
-        {
-            clientAdjustFullscreenLayer (client_focus, FALSE);
-        }
         clientRaise (c, None);
         clientShow (c, TRUE);
         clientSetFocus (screen_info, c,
@@ -482,7 +478,6 @@ void
 clientUpdateFocus (ScreenInfo *screen_info, Client * c, unsigned short flags)
 {
     Client *c2;
-    gboolean restacked;
 
     TRACE ("entering");
 
@@ -505,7 +500,6 @@ clientUpdateFocus (ScreenInfo *screen_info, Client * c, unsigned short flags)
     if (c2)
     {
         clientSetNetState (c2);
-        clientAdjustFullscreenLayer (c2, FALSE);
         frameQueueDraw (c2, FALSE);
         clientUpdateOpacity (c2);
     }
@@ -523,20 +517,6 @@ clientUpdateFocus (ScreenInfo *screen_info, Client * c, unsigned short flags)
             FLAG_UNSET (c->flags, CLIENT_FLAG_DEMANDS_ATTENTION);
         }
         clientSetNetState (c);
-        restacked = clientAdjustFullscreenLayer (c, TRUE);
-
-        if (!restacked && screen_info->params->raise_on_focus)
-        {
-            if (screen_info->params->click_to_focus)
-            {
-                clientRaise (c, None);
-                clientSetLastRaise (c);
-            }
-            else
-            {
-                clientResetDelayedRaise (screen_info);
-            }
-        }
         frameQueueDraw (c, FALSE);
         clientUpdateOpacity (c);
     }

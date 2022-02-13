@@ -47,6 +47,7 @@
 #include "poswin.h"
 #include "screen.h"
 #include "settings.h"
+#include "stacking.h"
 #include "transients.h"
 #include "event_filter.h"
 #include "wireframe.h"
@@ -1133,6 +1134,9 @@ clientMoveEventFilter (XfwmEvent *event, gpointer data)
         gtk_main_quit ();
     }
 
+    /* Lower fullscreen clients that overlap with the new position */
+    clientLowerFullscreenClients(c, TRUE);
+   
     return status;
 }
 
@@ -1675,6 +1679,9 @@ clientResizeEventFilter (XfwmEvent *event, gpointer data)
         TRACE ("event loop now finished");
         gtk_main_quit ();
     }
+
+    /* Lower fullscreen clients that overlap with the new position */
+    clientLowerFullscreenClients(c, TRUE);
 
     return status;
 }
