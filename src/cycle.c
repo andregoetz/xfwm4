@@ -367,6 +367,11 @@ clientCycleEventFilter (XfwmEvent *event, gpointer data)
                             tabwinSelectHovered (passdata->tabwin);
                             break;
                         }
+                        else if (event->button.button == Button2)
+                        {
+                            c2 = tabwinSelectHovered (passdata->tabwin);
+                            clientClose (c2);
+                        }
                         else if (event->button.button == Button4)
                         {
                             /* Mouse wheel scroll up */
