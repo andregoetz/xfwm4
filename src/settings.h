@@ -55,6 +55,7 @@ enum
 enum
 {
     KEY_CANCEL = 0,
+    KEY_SELECT,
     KEY_DOWN,
     KEY_LEFT,
     KEY_RIGHT,

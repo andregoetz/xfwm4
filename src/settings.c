@@ -564,6 +564,7 @@ loadKeyBindings (ScreenInfo *screen_info)
     shortcuts = xfce_shortcuts_provider_get_shortcuts (screen_info->shortcuts_provider);
 
     parseShortcut (screen_info, KEY_CANCEL, "cancel_key", shortcuts);
+    parseShortcut (screen_info, KEY_SELECT, "select_key", shortcuts);
     parseShortcut (screen_info, KEY_DOWN, "down_key", shortcuts);
     parseShortcut (screen_info, KEY_LEFT, "left_key", shortcuts);
     parseShortcut (screen_info, KEY_RIGHT, "right_key", shortcuts);

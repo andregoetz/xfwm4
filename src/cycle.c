@@ -242,7 +242,7 @@ clientCycleEventFilter (XfwmEvent *event, gpointer data)
     Client *c, *removed;
     Client *c2 = NULL;
     eventFilterStatus status;
-    KeyCode cancel, left, right, up, down;
+    KeyCode cancel, select, left, right, up, down;
     int key, modifiers;
     gboolean cycling;
     GList *li;
@@ -259,6 +259,7 @@ clientCycleEventFilter (XfwmEvent *event, gpointer data)
     screen_info = c->screen_info;
     display_info = screen_info->display_info;
     cancel = screen_info->params->keys[KEY_CANCEL].keycode;
+    select = screen_info->params->keys[KEY_SELECT].keycode;
     left = screen_info->params->keys[KEY_LEFT].keycode;
     right = screen_info->params->keys[KEY_RIGHT].keycode;
     up = screen_info->params->keys[KEY_UP].keycode;
@@ -284,13 +285,12 @@ clientCycleEventFilter (XfwmEvent *event, gpointer data)
                  */
                 if (event->key.keycode == cancel)
                 {
-                    if (passdata->keepOpen) {
-                        c2 = tabwinGetSelected (passdata->tabwin);
-                    }
-                    else
-                    {
-                        c2 = tabwinSelectHead (passdata->tabwin);
-                    }
+                    c2 = tabwinSelectHead (passdata->tabwin);
+                    cycling = FALSE;
+                }
+                else if (event->key.keycode == select)
+                {
+                    c2 = tabwinGetSelected (passdata->tabwin);
                     cycling = FALSE;
                 }
                 else if (event->key.keycode == up)
