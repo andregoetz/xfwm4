@@ -499,8 +499,8 @@ clientCycle (Client * c, XfwmEventKey *event)
     else if (key == KEY_CYCLE_KEEP_WINDOWS)
     {
         selected = g_list_next (client_list);
-        modifier = screen_info->params->keys[KEY_CYCLE_KEEP_WINDOWS].modifier;
         passdata.keepOpen = TRUE;
+        modifier = TRUE; /* We pretend to have a modifier in order to always enter the cycle loop */
     }
     else
     {
